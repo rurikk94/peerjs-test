@@ -1,3 +1,4 @@
+
 // var Peer = require("peerjs")
 import { Peer } from "peerjs";
 
@@ -25,7 +26,7 @@ function crear() {
         appendLog(`Conexion recibida con ${conn.peer}`);
         conn.on("data", (data) => {
             appendLog(`Data recibido: ${JSON.stringify(data)}`);
-            if (data && typeof data === 'object') {
+            if (data && typeof data === 'object' && Object.hasOwn(data, "dom")) {
                 mostrarEnSoporte(data);
             }
         });
@@ -68,6 +69,18 @@ function enviar() {
     });
 }
 
+
+function enviarACliente(data) {
+    const mensaje = data
+    const destinoId = document.getElementById("destinoId").value
+
+    destinoPeer = myPeer.connect(destinoId);
+    destinoPeer.on("open", () => {
+        appendLog(`Enviando mensaje a ${destinoId}: ${mensaje}`);
+        destinoPeer.send(mensaje)
+    });
+}
+
 const btnCrear = document.getElementById("btnCrear")
 btnCrear.addEventListener("click", crear)
 
@@ -94,4 +107,106 @@ function mostrarEnSoporte(datos) {
 
   // Inyectamos el DOM como antes
   iframeContenedor.srcdoc = datos.dom;
+
+    // Esperar a que el contenido del iframe esté listo
+    iframeContenedor.onload = function () {
+        const iframeDoc = iframeContenedor.contentDocument || iframeContenedor.contentWindow.document;
+        if (!iframeDoc) return;
+
+        // Mouse move dentro del iframe
+        iframeDoc.addEventListener('mousemove', function (e) {
+            var data = { x: e.clientX, y: e.clientY, type: 'mousemove' };
+            console.log('Mouse dentro del iframe:', data);
+            enviarACliente(data)
+        });
+
+        // Clicks dentro del iframe
+        iframeDoc.addEventListener('click', function (e) {
+            var data = { x: e.clientX, y: e.clientY, button: e.button, type: 'click' };
+            console.log('Click dentro del iframe:', data);
+            enviarACliente(data);
+        });
+
+        // Teclas presionadas dentro del iframe
+        iframeDoc.addEventListener('keydown', function (e) {
+            // var data = { key: e.key, code: e.code, ctrl: e.ctrlKey, shift: e.shiftKey, alt: e.altKey, type: 'keydown' };
+            // console.log('Tecla presionada en el iframe:', data);
+            // enviarACliente(data)
+        });
+        // Listener para capturar focus en inputs, botones y selects
+        iframeDoc.addEventListener('focusin', function(e) {
+            const target = e.target;
+            if (!target) return;
+            if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.tagName === 'SELECT') {
+                const info = {
+                    type: 'focus',
+                    tag: target.tagName,
+                    id: target.id || null,
+                    name: target.name || null,
+                    value: target.value || null
+                };
+                enviarACliente(info);
+            }
+        });
+
+        // Listener para capturar cambios en inputs y selects
+        iframeDoc.addEventListener('change', function(e) {
+            const target = e.target;
+            if (!target) return;
+            if (target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+                const info = {
+                    type: 'change',
+                    tag: target.tagName,
+                    id: target.id || null,
+                    name: target.name || null,
+                    value: target.value || null
+                };
+                enviarACliente(info);
+            }
+        });
+        iframeDoc.addEventListener('input', function(e) {
+            const target = e.target;
+            if (!target) return;
+            if (target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+                const info = {
+                    type: 'input',
+                    tag: target.tagName,
+                    id: target.id || null,
+                    name: target.name || null,
+                    value: target.value || null
+                };
+                enviarACliente(info);
+            }
+        });
+        // Listener global para capturar clicks en inputs, botones y selects
+        iframeDoc.addEventListener('click', function(e) {
+            const target = e.target;
+            if (!target) return;
+            if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.tagName === 'SELECT') {
+                const rect = target.getBoundingClientRect();
+                const x = e.clientX;
+                const y = e.clientY;
+                const info = {
+                    type: 'click',
+                    tag: target.tagName,
+                    id: target.id || null,
+                    name: target.name || null,
+                    value: target.value || null,
+                    x,
+                    y
+                };
+                enviarACliente(info);
+            }
+        });
+
+        iframeDoc.addEventListener('scroll', function (e) {
+            const scrollInfo = {
+                type: 'scroll',
+                scrollTop: iframeDoc.documentElement.scrollTop || iframeDoc.body.scrollTop,
+                scrollLeft: iframeDoc.documentElement.scrollLeft || iframeDoc.body.scrollLeft
+            };
+            console.log('Scroll dentro del iframe:', scrollInfo);
+            enviarACliente(scrollInfo);
+        }, true);
+    };
 }

@@ -24,12 +24,147 @@ function crear() {
     myPeer.on("connection", (conn) => {
         appendLog(`Conexion recibida con ${conn.peer}`);
         conn.on("data", (data) => {
-            appendLog(`Data recibido: ${data}`);
+            appendLog(`Data recibido: ${JSON.stringify(data)}`);
+            if (data && typeof data === 'object' && Object.hasOwn(data, "dom")) {
+                mostrarEnSoporte(data);
+            }
+            if (data && typeof data === 'object' && Object.hasOwn(data, "type")) {
+                if (data.type === 'mousemove') {
+                    mostrarMouseVirtual(data.x, data.y);
+                } else if (data.type === 'click') {
+                    animarClickMouseVirtual(data.x, data.y);
+                    simularClickEnPosicion(data.x, data.y);
+                } else if (data.type === 'keydown') {
+                   // simularKeydownEnElementoActivo(data);
+
+                } else if (data.type === 'focus') {
+                    enfocarElementoRemoto(data);
+                } else if (data.type === 'change') {
+                    cambiarValorElementoRemoto(data);
+                } else if (data.type === 'input') {
+                    cambiarValorElementoRemoto(data);
+                } else if (data.type === "scroll") {
+                    hacerScroll(data)
+                }
+
+function hacerScroll(data) {
+    if (typeof data.scrollTop === "number" && typeof data.scrollLeft === "number") {
+        // document.documentElement.scrollTop = data.scrollTop;
+        // document.body.scrollTop = data.scrollTop;
+        // document.documentElement.scrollLeft = data.scrollLeft;
+        // document.body.scrollLeft = data.scrollLeft;
+
+        scrollTo(data.scrollLeft, data.scrollTop);
+    }
+
+}
+// Enfocar el elemento remoto según id, name o tag
+function enfocarElementoRemoto(data) {
+    let el = null;
+    if (data.id) {
+        el = document.getElementById(data.id);
+    }
+    if (!el && data.name) {
+        el = document.querySelector(`[name="${data.name}"]`);
+    }
+    if (!el && data.tag) {
+        el = document.querySelector(data.tag.toLowerCase());
+    }
+    if (el && el.focus) {
+        el.focus();
+    }
+}
+
+// Cambiar el valor del elemento remoto según id, name o tag
+function cambiarValorElementoRemoto(data) {
+    let el = null;
+    if (data.id) {
+        el = document.getElementById(data.id);
+    }
+    if (!el && data.name) {
+        el = document.querySelector(`[name="${data.name}"]`);
+    }
+    if (!el && data.tag) {
+        el = document.querySelector(data.tag.toLowerCase());
+    }
+    if (el) {
+        el.value = data.value;
+        // Disparar evento input y change para que la UI reaccione
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+// Simular evento keydown en el elemento enfocado
+function simularKeydownEnElementoActivo(data) {
+    const el = document.activeElement;
+    if (!el) return;
+    // Crear un evento KeyboardEvent con los datos recibidos
+    const evt = new KeyboardEvent('keydown', {
+        key: data.key || '',
+        code: data.code || '',
+        ctrlKey: !!data.ctrl,
+        shiftKey: !!data.shift,
+        altKey: !!data.alt,
+        bubbles: true,
+        cancelable: true
+    });
+    el.dispatchEvent(evt);
+    // Si es un input o textarea y es una tecla de texto, modificar el valor
+    if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && typeof data.key === 'string' && data.key.length === 1) {
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const value = el.value;
+        el.value = value.slice(0, start) + data.key + value.slice(end);
+        el.selectionStart = el.selectionEnd = start + 1;
+    }
+}
+// Animación de clic en el mouse virtual
+function animarClickMouseVirtual(x, y) {
+    let mouse = document.getElementById('mouse-virtual');
+    if (!mouse) return;
+    mouse.style.boxShadow = '0 0 0 8px rgba(52,152,219,0.3)';
+    setTimeout(() => {
+        mouse.style.boxShadow = '';
+    }, 150);
+}
+
+// Simular click real en el elemento bajo el mouse virtual
+function simularClickEnPosicion(x, y) {
+    // Ajustar por el scroll de la página
+    const realX = x;
+    const realY = y;
+    const elem = document.elementFromPoint(realX, realY);
+    if (elem) {
+        elem.focus && elem.focus();
+        elem.click && elem.click();
+    }
+}
+            }
         });
         conn.on("open", () => {
             appendLog("Conexión abierta");
         });
     });
+}
+// Mouse virtual
+function mostrarMouseVirtual(x, y) {
+    let mouse = document.getElementById('mouse-virtual');
+    if (!mouse) {
+        mouse = document.createElement('div');
+        mouse.id = 'mouse-virtual';
+        mouse.style.position = 'fixed';
+        mouse.style.width = '20px';
+        mouse.style.height = '20px';
+        mouse.style.background = 'rgba(52,152,219,0.7)';
+        mouse.style.border = '2px solid #fff';
+        mouse.style.borderRadius = '50%';
+        mouse.style.pointerEvents = 'none';
+        mouse.style.zIndex = '9999';
+        mouse.style.transition = 'left 0.05s linear, top 0.05s linear';
+        document.body.appendChild(mouse);
+    }
+    mouse.style.left = (x - 10) + 'px';
+    mouse.style.top = (y - 10) + 'px';
 }
 
 function conectar() {
