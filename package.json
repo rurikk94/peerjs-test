@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "The JavaScript template",
   "scripts": {
-    "start": "parcel ./src/index.html",
-    "build": "parcel build ./src/index.html"
+  "start": "parcel ./src/index.html ./src/index2.html",
+  "build": "parcel build ./src/index.html ./src/index2.html"
   },
   "devDependencies": {
     "parcel": "^2.0.0",

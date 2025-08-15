@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	</script>
+<body>
+    my id
+    <input type="text" name="myId" id="myId">
+    <button type="button" name="btnCrear" id="btnCrear">crear</button>
+    destino id
+    <input type="text" name="destinoId" id="destinoId">
+    <button type="button" name="btnConectar" id="btnConectar">conectar</button>
+    <input type="text" name="message" id="message">
+    <button type="button" name="btnEnviar" id="btnEnviar">enviar</button>
+    <button id="mostrarBtn">Capturar y Mostrar DOM</button>
+
+    <div id="log" style="max-height: 100px; overflow-y: auto;"></div>
+    <script src="index2.js" type="module"></script>
+    <script src="share.js" type="module"></script>
+
+
+</body>
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoA6DQD1KQ2U5h7MQ5E6Q5WnqE1zWk5Q5Q5Q5Q5Q5Q5Q5Q5" crossorigin="anonymous"></script>
+</body>
+        <div class="container mt-5">
+            <form>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="mb-3">
+                    <label for="fecha" class="form-label">Fecha</label>
+                    <input type="date" class="form-control" id="fecha" name="fecha" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Sexo</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sexo" id="sexoM" value="masculino" required>
+                        <label class="form-check-label" for="sexoM">Masculino</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sexo" id="sexoF" value="femenino">
+                        <label class="form-check-label" for="sexoF">Femenino</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="ciudad" class="form-label">Ciudad</label>
+                    <select class="form-select" id="ciudad" name="ciudad" required>
+                        <option value="">Selecciona una ciudad</option>
+                        <option value="cdmx">Ciudad de México</option>
+                        <option value="gdl">Guadalajara</option>
+                        <option value="mtY">Monterrey</option>
+                        <option value="puebla">Puebla</option>
+                        <option value="merida">Mérida</option>
+                    </select>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="terminos" name="terminos" required>
+                    <label class="form-check-label" for="terminos">Acepto los términos y condiciones</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>

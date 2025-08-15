@@ -15,7 +15,10 @@
     <input type="text" name="message" id="message">
     <button type="button" name="btnEnviar" id="btnEnviar">enviar</button>
 
-    <div id="log"></div>
+    <div id="log" style="max-height: 100px; overflow-y: auto;"></div>
+    <div style="overflow: auto; border: 2px solid #3498db; resize: both">
+    <iframe id="vistaIframe" style="transform-origin: top left"></iframe>
+    </div>
     <script src="index.js" type="module"></script>
 </body>
 </html>
